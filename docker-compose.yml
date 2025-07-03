@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: skcc-travel-webapp
+
+    # Map Port: "HOST_PORT:CONTAINER_PORT"
+    # ทำให้พอร์ต 8080 บนเครื่อง Local ของคุณเชื่อมกับพอร์ต 3000 ภายใน Container
+    ports:
+      - "8080:3000"
+
+    volumes:
+      # เชื่อมโยง Source Code จากเครื่อง Local เข้ากับ /app ใน Container
+      - .:/app
+      # ยกเว้น node_modules ใน Container ไม่ให้ถูกทับด้วยของจาก Host
+      - /app/node_modules
+
+    # กำหนด Environment Variables สำหรับภายใน Container
+    environment:
+      NODE_ENV: development
+      # *** FIX: Next.js Development Server Environment Variables ***
+      # HOSTNAME และ PORT เป็น Environment Variables มาตรฐานที่ Node.js/Next.js รู้จัก
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+
+    # คำสั่งที่จะรันเมื่อ Container นี้เริ่มต้น (สำหรับ Development Mode)
+    # เรากลับไปใช้ npm run dev ปกติ เพราะ Host/Port ถูกกำหนดด้วย Environment Variables แล้ว
+    command: npm run dev
+
+    restart: always
